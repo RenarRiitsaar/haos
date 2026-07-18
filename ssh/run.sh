@@ -4,6 +4,9 @@ set -e
 
 bashio::log.info "Starting SSH server"
 
+# Generate SSH host keys if missing
+ssh-keygen -A
+
 if bashio::config.has_value 'password'; then
     PASSWORD=$(bashio::config 'password')
     echo "root:${PASSWORD}" | chpasswd
@@ -15,4 +18,4 @@ if bashio::config.has_value 'authorized_keys'; then
     chmod 600 /root/.ssh/authorized_keys
 fi
 
-/usr/sbin/sshd -D
+exec /usr/sbin/sshd -D
