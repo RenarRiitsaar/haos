@@ -2,14 +2,19 @@ name: ARM SSH Terminal
 version: "1.0.0"
 slug: arm_ssh_terminal
 description: Simple SSH server for ARMv7 Home Assistant
+
 arch:
   - armv7
+
 startup: services
 boot: auto
 init: false
 
 ports:
   22/tcp: 22
+
+map:
+  - config:rw
 
 options:
   password: "changeme"
