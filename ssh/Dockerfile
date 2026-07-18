@@ -29,7 +29,9 @@ RUN \
         bash-completion \
         bind-tools \
         bluez \
+        ca-certificates \
         colordiff \
+        curl \
         docker-bash-completion \
         docker-zsh-completion \
         gcompat \
@@ -66,8 +68,10 @@ RUN \
         zsh-autosuggestions \
         zsh-syntax-highlighting \
     \
+    && update-ca-certificates \
+    \
     && git clone --depth 1 \
-        https://github.com/robbyrussell/oh-my-zsh.git \
+        https://github.com/ohmyzsh/ohmyzsh.git \
         /root/.oh-my-zsh \
     \
     && curl -L -s -o /usr/bin/ha \
@@ -99,14 +103,14 @@ RUN \
         -DLWS_WITH_SHARED=ON \
         -DLWS_WITHOUT_TESTAPPS=ON \
     \
-    && make \
+    && make -j"$(nproc)" \
     && make install \
     \
-    && git clone --branch main --single-branch \
+    && git clone \
+        --branch "${TTYD_VERSION}" \
+        --depth=1 \
         https://github.com/tsl0922/ttyd.git \
         /tmp/ttyd \
-    \
-    && git -C /tmp/ttyd checkout "${TTYD_VERSION}" \
     \
     && mkdir -p /tmp/ttyd/build \
     \
@@ -117,12 +121,15 @@ RUN \
         -DCMAKE_INSTALL_PREFIX=/usr \
         -DCMAKE_VERBOSE_MAKEFILE=TRUE \
     \
-    && make \
+    && make -j"$(nproc)" \
     && make install \
     \
     && cp /usr/bin/docker /usr/local/bin/.undocked \
     \
-    && pip3 install --no-cache-dir -r /tmp/requirements.txt \
+    && pip3 install \
+        --no-cache-dir \
+        --break-system-packages \
+        -r /tmp/requirements.txt \
     \
     && apk del --no-cache --purge .build-dependencies \
     \
